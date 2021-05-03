@@ -1,364 +1,348 @@
-/* eslint-disable no-undef */
 <template>
-  <div class="Result">
-    <NavBar />
-    <vs-button class="download" @click="reportDownload" color="rgb(125, 140, 176)" type="filled"
-      >Download Report
-      <b-icon-download></b-icon-download>
-    </vs-button>
-    <div class="A4" ref="myReport">
-      <h2>Skill Lab PracticeTest Report</h2>
-      <hr />
-      <div class="list">
-        <ul class="list-group text-left m-2">
-          <li class="list-group-item">
-            Date: <b>{{ date }}</b>
-          </li>
-          <!-- <li class="list-group-item">
-            Net Time Taken: <b>{{ formattedAudioLength(totalTime) }}</b>
-          </li> -->
-          <!-- <li class="list-group-item">
-            Total Tests: <b>{{ mytestNo }}</b>
-          </li>
-          -->
+    <div class="userdata">
+        <NavBar />
+        <div>
+            <vs-collapse accordion not-arrow>
+                <vs-collapse-item v-for="tests in storedTranscriptions" :key="tests.id">
+                    <div slot="header" class="header-collapse">
+                        <div>
+                            <!-- <span>{{ tests.date }}</span> -->
+                            <vs-button color="primary" type="filled">Get Diff</vs-button>
+                        </div>
+                    </div>
 
-          <!-- <li class="list-group-item">
-            Audio: <b>{{ audioTitle }}</b>
-          </li> -->
-          <!-- <li class="list-group-item">
-            Total Errors: <b>{{ totalError }}</b>
-          </li> -->
-        </ul>
-      </div>
-      <div class="para">
-        <p>
-          <b>{{ textTop }} {{ nameFromEmail }}, you scored {{ Accuracy.toFixed(3) }}%</b><br />
-          {{ topBody }}<br /><br />
-          <!-- <b>Time:</b><br />You took {{ totalTime }} to complete all the test, which is<br /><br /> -->
-          <!-- {{ ratio }} minutes taken to transcribe one minute of audio.<br /><br />  -->
-          <!-- <b>Grammar:</b><br />
-          You entered {{ wordCount }} words, from which {{ wordCount - totalError }} were correct
-          and {{ totalError }} had grammatical errors.<br /> -->
-        </p>
-        <p class="bar">
-          <b>Diff: {{ Diff.toFixed(3) }}%</b
-          ><vs-progress
-            color="rgba(86, 72, 72, 0.5)"
-            :height="12"
-            :percent="Math.floor(Diff)"
-          ></vs-progress>
-        </p>
-        <p class="bar">
-          <b>Accuracy: {{ Accuracy.toFixed(3) }}%</b
-          ><vs-progress
-            color="rgba(86, 72, 72, 0.5)"
-            :height="12"
-            :percent="Math.floor(Accuracy)"
-          ></vs-progress>
-        </p>
-        <!-- <p class="bar">
-          <b>Grammar: {{ grammarAccuracy }}%</b
-          ><vs-progress
-            :height="12"
-            :percent="Math.floor(grammarAccuracy)"
-            color="rgba(86, 72, 72, 0.5)"
-          ></vs-progress>
-        </p> -->
-        <!-- <p class="bar">
-          <b>Average: {{ ((parseFloat(jsDiff) + parseFloat(grammarAccuracy)) / 2).toFixed(3) }}%</b
-          ><vs-progress
-            :height="12"
-            :percent="Math.floor(avgAccuracy)"
-            color="rgba(86, 72, 72, 0.5)"
-          ></vs-progress>
-        </p> -->
-      </div>
-      <vs-divider></vs-divider>
-      <!-- <div class="graph">
-        <mdb-container>
-          <mdb-radar-chart
-          :data="radarChartData"
-          :options="radarChartOptions"
-          :width="1500"
-          :height="750"
-          ></mdb-radar-chart>
-        </mdb-container>
-      </div> -->
-      <!-- <vs-table v-if="totalError > 0" stripe :data="grammarError" class="grammar-info">
-        <template slot="header">
-          <h3>Grammar Information</h3>
-        </template>
-        <template slot="thead">
-          <vs-th>Sentence</vs-th>
-          <vs-th>Issue</vs-th>
-        </template>
-        <template slot-scope="{ data }">
-          <vs-tr :key="indextr" v-for="(tr, indextr) in data">
-            <vs-td :data="tr.sentence">
-              {{ tr.sentence }}
-            </vs-td>
-            <vs-td :data="tr.message">
-              {{ tr.message }}
-            </vs-td>
-          </vs-tr>
-        </template>
-      </vs-table> -->
-      <vs-row v-for="(value, index) in Test" :key="index" vs-justify="center">
-        <vs-col type="flex" vs-justify="center" vs-align="center" vs-w="12">
-          <vs-card actionable class="cardx">
-            <div slot="header">
-              <h5>PracticeTest</h5>
-            </div>
-            <div>
-              <div>
-                <b>Audio: {{ practiceAudiosTitle }}</b>
-              </div>
-              <div>
-                <b>Time Taken: {{ formattedAudioLength(value[`test${index + 1}`].timetaken) }}</b>
-              </div>
-              <div>
-                <b>JsDiff: {{ value[`test${index + 1}`].jsDiff }}</b>
-              </div>
-              <div>
-                <b>Accuracy: {{ value[`test${index + 1}`].accuracy }}</b>
-              </div>
-              <div>
-                <b>AudioLength: {{ selectedAudioslength }}</b>
-              </div>
-            </div>
-          </vs-card>
-        </vs-col>
-      </vs-row>
-      <vs-button
-        class="actionbutton"
-        @click.native="retakeTest"
-        color="rgb(125, 140, 176)"
-        type="filled"
-        >Retake PracticeTest
-      </vs-button>
-      <vs-button
-        class="actionbutton"
-        @click.native="returnHome"
-        color="rgb(125, 140, 176)"
-        type="filled"
-        >Home
-      </vs-button>
-      <div>
-        <!-- <vs-row v-if="HardTest != undefined">
-          <vs-col type="flex" vs-justify="center" vs-align="center" vs-w="12"> </vs-col>
-          <vs-card actionable class="cardx">
-            <div slot="header">
-              <h5>Test: SuperHard</h5>
-            </div>
-            <div>
-              <div>
-                <b>Audio: {{ HardTest.audioSelected }}</b>
-              </div>
-              <div>
-                <b>Time Taken: {{ formattedAudioLength(HardTest.timetaken) }}</b>
-              </div>
-              <div>
-                <b>JsDiff: {{ HardTest.jsDiff }}</b>
-              </div>
-              <div>
-                <b>Accuracy: {{ HardTest.accuracy }}</b>
-              </div>
-              <div>
-                <b>AudioLength: {{ HardAudiolength }}</b>
-              </div>
-            </div>
-          </vs-card>
-        </vs-row> -->
-      </div>
+                    <div>
+                        <vs-tabs alignment="center" color="white" class="white">
+                            <vs-tab
+                                @click="
+                                    loadDiff(
+                                        tests.id + '___' + test[`test${key + 1}`].audioSelected,
+                                        getTranscriptText(test[`test${key + 1}`]),
+                                    )
+                                "
+                                :label="'Test ' + (key + 1)"
+                                :key="key"
+                                v-for="(test, key) in tests.tests"
+                            >
+                                <div style="font-size: 20px">Email: {{ currentUseremail }}</div>
+                                <div>Title: {{ test[`test${key + 1}`].audioSelected[0] }}</div>
+                                <div>
+                                    Diff:
+                                    <span
+                                        :ref="
+                                            tests.id +
+                                            '0' +
+                                            '---' +
+                                            test[`test${key + 1}`].audioSelected
+                                        "
+                                        >{{ test[`test${key + 1}`].jsDiff }}</span
+                                    >%
+                                    <b-icon
+                                        icon="arrow-clockwise"
+                                        font-scale="1.1"
+                                        @click="
+                                            reDiff(
+                                                tests.id +
+                                                    '0' +
+                                                    '---' +
+                                                    test[`test${key + 1}`].audioSelected,
+                                                getTranscriptText(test[`test${key + 1}`]),
+                                                0,
+                                            )
+                                        "
+                                    ></b-icon>
+                                </div>
+                                <div>
+                                    Accuracy:
+                                    <span
+                                        :ref="
+                                            tests.id +
+                                            '1' +
+                                            '---' +
+                                            test[`test${key + 1}`].audioSelected
+                                        "
+                                        >{{ test[`test${key + 1}`].accuracy }}</span
+                                    >%
+                                    <b-icon
+                                        @click="
+                                            reDiff(
+                                                tests.id +
+                                                    '1' +
+                                                    '---' +
+                                                    test[`test${key + 1}`].audioSelected,
+                                                getTranscriptText(test[`test${key + 1}`]),
+                                                1,
+                                            )
+                                        "
+                                        icon="arrow-clockwise"
+                                        font-scale="1.1"
+                                    ></b-icon>
+                                </div>
+                                <div>
+                                    Test Time: {{ getTime(test[`test${key + 1}`].timetaken) }}
+                                </div>
+                                <div :ref="tests.id + '___' + test[`test${key + 1}`].audioSelected">
+                                    <div v-show="false">
+                                        {{ getTranscriptText(test[`test${key + 1}`]) }}
+                                    </div>
+                                </div>
+                            </vs-tab>
+                            <vs-tab
+                                v-if="tests.hardtest"
+                                label="Hard Test"
+                                @click="
+                                    loadDiff(
+                                        tests.id + '___' + tests.hardtest.audioSelected,
+                                        getTranscriptText(tests.hardtest),
+                                    )
+                                "
+                            >
+                                <div>Title: {{ tests.hardtest.audioSelected[0] }}</div>
+                                <div>Type: {{ tests.hardtest.type }}</div>
+                                <div>
+                                    Diff:
+                                    <span
+                                        :ref="tests.id + '0' + '---' + tests.hardtest.audioSelected"
+                                        >{{ tests.hardtest.jsDiff }}</span
+                                    >%
+                                    <b-icon
+                                        icon="arrow-clockwise"
+                                        font-scale="1.1"
+                                        @click="
+                                            reDiff(
+                                                tests.id +
+                                                    '0' +
+                                                    '---' +
+                                                    tests.hardtest.audioSelected,
+                                                getTranscriptText(tests.hardtest),
+                                                0,
+                                            )
+                                        "
+                                    ></b-icon>
+                                </div>
+                                <div>
+                                    Accuracy:
+                                    <span
+                                        :ref="tests.id + '1' + '---' + tests.hardtest.audioSelected"
+                                        >{{ tests.hardtest.accuracy }}</span
+                                    >%
+                                    <b-icon
+                                        icon="arrow-clockwise"
+                                        font-scale="1.1"
+                                        @click="
+                                            reDiff(
+                                                tests.id +
+                                                    '1' +
+                                                    '---' +
+                                                    tests.hardtest.audioSelected,
+                                                getTranscriptText(tests.hardtest),
+                                                1,
+                                            )
+                                        "
+                                    ></b-icon>
+                                </div>
+                                <div>Test Time: {{ getTime(tests.hardtest.timetaken) }}</div>
+                                <div :ref="tests.id + '___' + tests.hardtest.audioSelected">
+                                    <div v-show="false">
+                                        {{ getTranscriptText(tests.hardtest) }}
+                                    </div>
+                                </div>
+                            </vs-tab>
+                        </vs-tabs>
+                    </div>
+                </vs-collapse-item>
+            </vs-collapse>
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import NavBar from '@/components/NavBar.vue';
 import AlertMsg from '@/mixins/AlertMsg';
-import ResultWords from '@/mixins/ResultWords';
-import * as firebase from 'firebase/app';
 import 'firebase/auth';
-// import { mdbRadarChart, mdbContainer } from 'mdbvue';
-import html2pdf from 'html2pdf.js';
-import { db } from '@/firebase/db';
-import { getSingleUser, getSingleAudio } from './api/Api';
+import NavBar from '@/components/NavBar.vue';
+import * as firebase from 'firebase/app';
+import * as Diff from 'diff';
+import { db } from '../firebase/db';
+import 'firebase/database';
+import { getSingleUser, getpracticeDataByGroup } from './api/Api';
+import diffCalc from '../utilities/diffCalculator';
 
-// import jspdf from 'jspdf';
-// @ is an alias to /src
 export default {
-  name: 'Result',
-  props: {
-    transId: {
-      type: String,
+    name: 'UserData',
+    props: {
+        transId: {
+            type: String,
+        },
     },
-  },
-  mixins: [AlertMsg, ResultWords],
-  components: {
-    NavBar,
-  },
-  data() {
-    return {
-      current_user_email: null,
-      date: '',
-      selectedAudios: '',
-      HardAudiolength: '',
-      totalTime: 0,
-      Diff: 0,
-      Accuracy: 0,
-      topBody: '',
-      textTop: '',
-      HardTest: [],
-      nameFromEmail: '',
-      practiceAudiosTitle: '',
-      Test: [],
-      selectedAudioslength: '',
-      radarChartData: {
-        labels: ['Measure 1', 'Measure 2', 'Measure 3', 'Measure 4', 'Measure 5', 'Measure 6'],
-        datasets: [
-          {
-            label: '25/09/2020',
-            backgroundColor: 'rgba(255, 99, 132, 0.1)',
-            borderColor: 'rgba(255, 99, 132, 1)',
-            borderWidth: 1,
-            data: [85, 99, 90, 71, 76, 24],
-          },
-        ],
-      },
-      radarChartOptions: {
-        responsive: true,
-        maintainAspectRatio: true,
-      },
-    };
-  },
-  methods: {
-    formattedAudioLength(audio) {
-      const min = Math.floor(audio / 60);
-      const sec = audio % 60;
-      return `${min}min ${sec}sec`;
-    },
-    reportDownload() {
-      if (this.$refs.myReport) {
-        const myFile = this.$refs.myReport;
-        const opt = {
-          margin: 0,
-          padding: 0,
-          filename: `${this.nameFromEmail}Report.pdf`,
-          image: { type: 'jpeg', quality: 1 },
-          html2canvas: { scale: 2 },
-          jsPDF: { unit: 'in', format: 'A4' },
+    mixins: [AlertMsg],
+    data() {
+        return {
+            storedTranscriptions: null,
+            userId: '',
+            userData: '',
+            originalData: null,
+            blockData: null,
         };
-        html2pdf().from(myFile).set(opt).save();
-      } else {
-        this.acceptAlert('danger', 'Error', 'Error Occured during downloading.');
-      }
     },
-    retakeTest() {
-      this.$router.push({ name: 'PracticeTest', params: { mode: 'practicetest' } });
+    components: {
+        NavBar,
     },
-    returnHome() {
-      this.$router.push({ name: 'Home', params: { mode: 'Home' } });
+
+    methods: {
+        getTime(time) {
+            const minsInNum = Math.floor(time / 60);
+            const minsPostfix = minsInNum > 1 ? 'minutes' : 'minute';
+            const secInNum = time % 60;
+            const secsPostfix = secInNum > 1 ? 'seconds' : 'second';
+            return `${minsInNum} ${minsPostfix} ${secInNum} ${secsPostfix}`;
+        },
+
+        reDiff(ref, transcriptText, choice) {
+            const selectedAudio = ref.split('---')[1];
+            const originalText = this.originalData[selectedAudio];
+            const newData = diffCalc(transcriptText, originalText)[choice];
+            this.$refs[ref][0].innerText = newData;
+        },
+
+        loadDiff(key, transText) {
+            this.$nextTick(() => {
+                const audio = key.split('___')[1];
+                const element = this.$refs[key][0];
+                const originalText = this.originalData[audio];
+                const diffBlock = this.produceDiffElement(transText, originalText);
+                element.innerHTML = '';
+                element.appendChild(diffBlock);
+            });
+        },
+        produceDiffElement(blockText, originalText) {
+            let span = null;
+            const diff = Diff.diffWords(blockText, originalText);
+            const fragment = document.createDocumentFragment();
+            diff.forEach((part) => {
+                // eslint-disable-next-line no-nested-ternary
+                const color = part.added ? 'green' : part.removed ? 'red' : 'grey';
+                span = document.createElement('span');
+                span.style.color = color;
+                if (part.removed) span.style.textDecoration = 'line-through';
+                span.appendChild(document.createTextNode(part.value));
+                fragment.appendChild(span);
+                if (part.removed) fragment.appendChild(document.createTextNode(' '));
+            });
+            // this.fragment = fragment;
+            return fragment;
+        },
+
+        getData(mytitle) {
+            return this.originalData.find((data) => data.title === mytitle);
+        },
+
+        getTranscriptText(transcriptData) {
+            return transcriptData.blocks.reduce(
+                (fullText, currentBlock) => `${fullText} ${currentBlock.text}`,
+                '',
+            );
+        },
+
+        async getOriginalData(audios) {
+            const originalData = {};
+            const originalText = await db
+                .collection('audioInfo')
+                .where('title', 'in', [...audios])
+                .get();
+            originalText.forEach((mydoc) => {
+                originalData[mydoc.data().title] = mydoc.data().comment;
+            });
+            return originalData;
+        },
+
+        async getTranscriptData() {
+            const transData = await getpracticeDataByGroup(
+                firebase.firestore.FieldPath.documentId(),
+                '==',
+                this.transId,
+            );
+            const newData = transData
+                .filter((transcript) => transcript.tests)
+                .map((transcription) => ({
+                    tests: [...transcription.tests],
+                    audios: transcription.selectedAudios,
+                    date: transcription.date,
+                    id: transcription.id,
+                }));
+            return newData;
+        },
+
+        getHardAudios(tests) {
+            return tests
+                .filter((trans) => trans.hardtest && trans.hardtest.audioSelected)
+                .map((trans) => trans.hardtest.audioSelected);
+        },
+
+        getAllAudioTitle(transcripts) {
+            const allAudio = transcripts.map((trans) => trans.audios).flat();
+            const hardAudios = this.getHardAudios(transcripts);
+            return Array.from(new Set([...allAudio, ...hardAudios]));
+        },
     },
-  },
-  async created() {
-    const user = firebase.auth().currentUser;
-    this.current_user_email = user.email;
-    this.nameFromEmail = this.current_user_email.substring(
-      0,
-      this.current_user_email.lastIndexOf('@'),
-    );
-    // eslint-disable-next-line no-unused-vars
-    const [userId, userData] = await getSingleUser(user.email);
-    console.log(userData);
-    const lastTransId = userData.practiceTests[userData.practiceTests.length - 1];
-    const transRef = db.collection('practiceTestData').doc(lastTransId);
-    const transData = await transRef.get();
-    const { Accuracy, Diff, tests, date, totalTime, selectedAudios } = transData.data();
-    this.totalTime = totalTime;
-    this.Accuracy = Accuracy;
-    this.Diff = Diff;
-    this.Test = tests;
-    this.date = date;
-    this.selectedAudios = selectedAudios;
-    const practiceAudioData = await getSingleAudio(selectedAudios[0]);
-    this.selectedAudioslength = practiceAudioData.audioData.duration;
-    this.practiceAudiosTitle = practiceAudioData.audioData.title;
-  },
+
+    async created() {
+        const user = firebase.auth().currentUser;
+        this.currentUseremail = user.email;
+        const [userId, userData] = await getSingleUser(this.currentUseremail);
+        [this.userId, this.userData] = [userId, userData];
+        if (!this.currentUseremail) {
+            this.$router.replace({ name: 'Transcriptions' });
+        }
+    },
+
+    async mounted() {
+        const allTests = await this.getTranscriptData();
+        const allAudios = this.getAllAudioTitle(allTests);
+        this.storedTranscriptions = allTests;
+        this.originalData = await this.getOriginalData(allAudios);
+
+        const refs = this.$refs;
+        Object.keys(refs).forEach((key) => {
+            if (key.includes('___')) {
+                const audio = key.split('___')[1];
+                const element = refs[key] && refs[key][0];
+                if (element) {
+                    const transText = element.firstChild.innerText;
+                    const originalText = this.originalData[audio];
+
+                    const diffBlock = this.produceDiffElement(transText, originalText);
+
+                    element.innerHTML = '';
+                    element.appendChild(diffBlock);
+                }
+            }
+        });
+    },
 };
 </script>
-
 <style scoped>
-.A4 {
-  background: white;
-  display: block;
-  margin: 8px auto;
-  margin-bottom: 0.5cm;
-  box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
-  width: 21cm;
-  height: 900px;
-  padding: 20px;
+table {
+    width: 50%;
 }
-/* @media print {
-  body, page {
-    margin: 5px;
-    box-shadow: 0;
-  }
+.cardx {
+    background-color: #05386bf5;
+    color: rgba(250, 235, 215, 0.788);
+}
+.real {
+    margin-right: 30px;
+}
+.date {
+    color: white;
+}
+/* .arrangeItems {
+  float: right;
+  padding-right: 3%;
 } */
-.download {
-  border-radius: 2px;
-  margin-top: 6%;
-  margin-right: 5%;
-  padding: 2px;
-  float: right;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  font-size: 16px;
-  cursor: pointer;
+.header-collapse {
+    color: white;
 }
-.actionbutton {
-  border-radius: 2px;
-  margin-top: 6%;
-  margin-right: 5%;
-  padding: 2px;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  font-size: 16px;
-  cursor: pointer;
-}
-.center {
-  margin: auto;
-  margin-top: 20px;
-  width: 100%;
-  border: 0px;
-  padding: 10px;
-  text-align: left;
-}
-.list {
-  float: left;
-  width: 30%;
-  /* margin-left: 5px; */
-}
-.grammar-info {
-  margin: auto;
-  margin-top: 15px;
-  width: 100%;
-  border: 0px;
-  padding: 10px;
-  text-align: left;
-}
-.para {
-  float: right;
-  width: 70%;
-  text-align: justify;
-  line-height: normal;
-  font-size: 16px;
-}
-.bar {
-  margin: 6px;
-  font-size: 14px;
+.white {
+    color: white;
 }
 </style>
