@@ -27,31 +27,31 @@ Vue.config.productionTip = false;
 Vue.use(Vuesax);
 // Register a global custom directive called `v-focus`
 Vue.directive('focus', {
-  // When the bound element is inserted into the DOM...
-  inserted(el) {
-    // Focus the element
-    el.focus();
-  },
+    // When the bound element is inserted into the DOM...
+    inserted(el) {
+        // Focus the element
+        el.focus();
+    },
 });
 
 // Register a global custom directive called `v-focus`
 Vue.directive('focus', {
-  // When the bound element is inserted into the DOM...
-  inserted(el) {
-    // Focus the element
-    el.focus();
-  },
+    // When the bound element is inserted into the DOM...
+    inserted(el) {
+        // Focus the element
+        el.focus();
+    },
 });
 
 // will help me to stay in the same page even after refresh when loggedin
 let app;
 
 firebase.auth().onAuthStateChanged(() => {
-  if (!app) {
-    app = new Vue({
-      router,
-      store,
-      render: (h) => h(App),
-    }).$mount('#app');
-  }
+    if (!app) {
+        app = new Vue({
+            router,
+            store,
+            render: (h) => h(App),
+        }).$mount('#app');
+    }
 });

@@ -1,8 +1,8 @@
 <template>
-  <div class="Home">
-    <NavBar />
-    <welcome />
-  </div>
+    <div class="Home">
+        <NavBar />
+        <welcome />
+    </div>
 </template>
 
 <script>
@@ -12,10 +12,10 @@ import Welcome from '@/components/Welcome.vue';
 // import { db } from '../firebase/db';
 
 export default {
-  name: 'Home',
-  components: {
-    NavBar,
-    Welcome,
-  },
+    name: 'Home',
+    components: {
+        NavBar,
+        Welcome,
+    },
 };
 </script>

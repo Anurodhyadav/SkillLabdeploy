@@ -14,6 +14,6 @@
 import { db } from '../../firebase/db';
 
 export const hasGivenTest = async (email) => {
-  const transcriptRef = await db.collection('transData').where('email', '==', email).get();
-  return !!transcriptRef.exists;
+    const transcriptRef = await db.collection('transData').where('email', '==', email).get();
+    return !!transcriptRef.exists;
 };
